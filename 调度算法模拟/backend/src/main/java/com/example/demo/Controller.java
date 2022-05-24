@@ -20,31 +20,33 @@ import java.util.List;
 import java.util.Map;
 @RestController
 public class Controller {
+    ObjectMapper objectMapper = new ObjectMapper();
     @PostMapping("/FCFS")
     @ResponseBody
     public String dealFCFS(@RequestBody String json) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(json);
-        ArrayList<JCB> jcbs = objectMapper.readValue(json, new TypeReference<ArrayList<JCB>>() {});
-        for(JCB tmp : jcbs){
-            System.out.println(tmp.toString());
-        }
+        ArrayList<JCB> jcbs = makeJcb(json);
         FCFS fcfs = new FCFS(jcbs);
         ArrayList<JCB> ans = fcfs.FCFSAlgorithm();
         return objectMapper.writeValueAsString(ans);
     }
     @PostMapping("/HRRN")
     @ResponseBody
-    public List<JCB> dealHRRN(@RequestBody Map<String,String> map){
-        ArrayList<JCB> jcbs = new ArrayList<>();
+    public String dealHRRN(@RequestBody String json) throws JsonProcessingException {
+        ArrayList<JCB> jcbs = makeJcb(json);
         HRRN hrrn = new HRRN(jcbs);
-        return hrrn.HRRNAlgorithm();
+        ArrayList<JCB> ans = hrrn.HRRNAlgorithm();
+        return objectMapper.writeValueAsString(ans);
     }
     @PostMapping("/SJF")
     @ResponseBody
-    public List<JCB> dealSJF(@RequestBody Map<String,String> map) {
-        ArrayList<JCB> jcbs = new ArrayList<>();
+    public String dealSJF(@RequestBody String json) throws JsonProcessingException {
+        ArrayList<JCB> jcbs = makeJcb(json);
         SJF sjf = new SJF(jcbs);
-        return sjf.SJFAlgorithm();
+        ArrayList<JCB> ans = sjf.SJFAlgorithm();
+        return objectMapper.writeValueAsString(ans);
+    }
+    private ArrayList<JCB> makeJcb(String json) throws JsonProcessingException {
+        ArrayList<JCB> jcbs = objectMapper.readValue(json, new TypeReference<ArrayList<JCB>>() {});
+        return jcbs;
     }
 }

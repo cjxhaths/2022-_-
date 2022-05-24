@@ -40,14 +40,18 @@
           <el-table-column label="服务时间" align="center" prop="serveTime">
             <template slot-scope="scope">
                <el-input 
-               v-model="scope.row.serveTime"></el-input>   
+               v-model="scope.row.serveTime"
+               >
+               </el-input>   
             </template>
           </el-table-column>
  
           <el-table-column label="紧急程度" align="center" prop="prior">
             <template slot-scope="scope">
                <el-input 
-               v-model="scope.row.prior"></el-input>   
+               v-model="scope.row.prior"
+               >
+               </el-input>   
             </template>
           </el-table-column>
           <el-table-column align="right">
@@ -70,19 +74,50 @@
             </template>
           </el-table-column>
           </el-table>               
-        <button @click="nextstep()" class="btn" style="margin-top:20px">提 交</button>
+        <button @click="visible = true" class="btn" style="margin-top:20px">提 交</button>
+        <el-dialog
+          title="请选择调度算法类型"
+          :visible.sync="visible"
+          width="30%"
+        >
+            <span>
+              <el-radio-group
+                v-model="num"
+                style="margin-left:12%"
+                :before-close="handleClose"
+              >
+              <el-radio :label="1">FCFS算法</el-radio>
+              <el-radio :label="2">HRRN算法</el-radio>
+              <el-radio :label="3">SJF算法</el-radio>
+              </el-radio-group>
+            </span>
+            <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="nextstep">确 定</el-button>
+              <el-button @click="visible = false">取 消</el-button>
+            </span>
+          </el-dialog>
       </div>
         </el-collapse-transition>
         <el-collopse-transition>
-          <div v-show="show3">
+          <div v-show="show3" style="margin-top:6%">
+          <h3 
+            style="margin-left:43%;margin-top:5%;margin-bottom:30px;font-weight: 300;"
+          >{{this.algorithm}}</h3>
           <el-table 
             :data="res_form"
-            style="width:620px; margin-left:9%;marign-top:50px"
+            style="width:620px; margin-left:9%;marign-top:10%"
             border  
             height="240"
             >
-              <el-table-column v-for="(item,id) in data2" :key="id">
-                
+              <el-table-column v-for="(item,id) in data2" :key="id" :label="item" align="center">
+                <template slot-scope="scope">
+                  <div v-if="id===0" align="center">{{scope.row.jobName}}</div>
+                  <div v-else-if="id===1" align="center">{{scope.row.arriveTime}}</div>
+                  <div v-else-if="id===2" align="center">{{scope.row.serveTime}}</div>
+                  <div v-else-if="id===3" align="center">{{scope.row.startTime}}</div>
+                  <div v-else-if="id===4" align="center">{{scope.row.completeTime}}</div>
+                  <div v-else align="center">{{scope.row.cyclingTime}}</div>
+                </template>
               </el-table-column>
           </el-table>
           </div>
@@ -95,20 +130,23 @@
 export default {
     data(){
         return{
-            sum:"",
             input_form:[],
             res_form:[],
-            data1:["序号","作业名","到达时间","服务时间","紧急程度"],
             data2:["进程名","到达时间","服务时间","开始时间","完成时间","周转时间"],
             show2:true,
             show3:false,
-            num1:"" 
+            visible:false,
+            num:1,
+            algorithm:"",
         }
     },
     created(){
       this.setTable();
     },
     methods:{
+        handleClose(done){
+          done();
+        },
         delete(index){
           console.log(index);
         },
@@ -136,14 +174,35 @@ export default {
         nextstep(){
             let param = this.input_form;
             let that = this;
-            this.axios.post("http://localhost:8080/api/FCFS",param).then((response) => {
-              for(var i = 0;i<response.data.length;i++){
-                that.res_form.push(response.data[i]);
-              }
-            })
-            console.log(this.res_form);
+            console.log(this.num);
+            console.log(this.algorithm);
+            if(Number(this.num) === 1){
+                this.axios.post("http://localhost:8080/api/FCFS",param).then((response) => {
+                  this.algorithm = "FCFS调度算法"
+                for(var i = 0;i<response.data.length;i++){
+                  that.res_form.push(response.data[i]);
+                }
+              })
+            }
+            else if(Number(this.num) === 2){
+                this.algorithm = "HRRN调度算法"
+                this.axios.post("http://localhost:8080/api/HRRN",param).then((response) => {
+                for(var i = 0;i<response.data.length;i++){
+                  that.res_form.push(response.data[i]);
+                }
+              })
+            }
+            else{
+                this.axios.post("http://localhost:8080/api/SJF",param).then((response) => {
+                this.algorithm = "SJF调度算法"
+                for(var i = 0;i<response.data.length;i++){
+                  that.res_form.push(response.data[i]);
+                }
+              })
+            }
             this.show2 = false
             this.show3 = true
+            this.visible = false
         }
     }
 }
