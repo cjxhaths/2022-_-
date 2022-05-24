@@ -12,6 +12,16 @@ public class JCB {
     private double completeTime;
     private double cyclingTime;
 
+    public JCB() {
+    }
+
+    public JCB(int jobSeq, String jobName, double arriveTime, double serveTime , double prior){
+        this.jobSeq = jobSeq;
+        this.jobName = jobName;
+        this.arriveTime = arriveTime;
+        this.serveTime = serveTime;
+        this.prior =  prior;
+    }
     public JCB(int jobSeq, String jobName, double arriveTime, double serveTime, double prior, double startTime, double waitTime, double completeTime, double cyclingTime) {
         this.jobSeq = jobSeq;
         this.jobName = jobName;
@@ -90,6 +100,21 @@ public class JCB {
 
     public void setCompleteTime(double completeTime) {
         this.completeTime = completeTime;
+    }
+
+    @Override
+    public String toString() {
+        return "JCB{" +
+                "jobSeq=" + jobSeq +
+                ", jobName='" + jobName + '\'' +
+                ", arriveTime=" + arriveTime +
+                ", serveTime=" + serveTime +
+                ", prior=" + prior +
+                ", startTime=" + startTime +
+                ", waitTime=" + waitTime +
+                ", completeTime=" + completeTime +
+                ", cyclingTime=" + cyclingTime +
+                '}';
     }
 
     public void setCyclingTime(double cyclingTime) {

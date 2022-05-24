@@ -10,7 +10,7 @@ const routes = [
   {
     path:'/showpage',
     component:showPage
-  }
+  },
 ]
 
 const router = new VueRouter({
